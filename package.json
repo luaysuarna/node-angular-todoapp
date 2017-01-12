@@ -1,0 +1,24 @@
+{
+  "name": "angular-todo-app",
+  "version": "1.0.0",
+  "description": "Angular Simplet Todo App",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "node server.js"
+  },
+  "author": "Luay Suarna",
+  "license": "BSD-2-Clause",
+  "dependencies": {
+    "express": "~4.14.0",
+    "angular": "~1.5.10",
+    "jquery": "~3.1.1",
+    "bootstrap": "~3.3.7",
+    "lodash": "~4.17.4",
+    "angular-ui-router": "~0.3.2",
+    "restangular": "~1.6.1"
+  },
+  "devDependencies": {
+    "webpack": "~1.12.13"
+  }
+}
