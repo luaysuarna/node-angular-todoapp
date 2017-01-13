@@ -1,17 +1,26 @@
+
+/**
+* Create app
+**/
 var express = require('express');
+var app     = express();
+const PORT  = process.env.PORT || 8080;
 
-// Create app
-var app = express();
-const PORT = process.env.PORT || 3001;
-
-app.use(function(req, res, next) {
-  if (req.headers['x-forwarded-proto'] === 'https') {
-    res.redirect('http://' + req.hostname + req.url)
-  } else {
-    next()
-  }
+app.use(function (req, res, next) {
+  // Website you wish to allow to connect
+  res.setHeader('Access-Control-Allow-Origin', '*');
+  // Request methods you wish to allow
+  res.setHeader('Access-Control-Allow-Methods', 'GET, POST, PUT, PATCH, DELETE');
+  // Request headers you wish to allow
+  res.setHeader('Access-Control-Allow-Headers', "Origin, X-Requested-With, Content-Type, Accept");
+  // Set to true if you need the website to include cookies in the requests sent
+  // to the API (e.g. in case you use sessions)
+  res.setHeader('Access-Control-Allow-Credentials', true);
+  // Pass to next layer of middleware
+  next();
 });
-app.use(express.static('public'));
+app.use(express.static('app/views/'));
+
 app.listen(PORT, function(){
   console.log('Server up using port ' + PORT);
 });
