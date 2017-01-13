@@ -1,7 +1,6 @@
-require('restangular');
 var Todo = require('Todo');
 
-var TodoService = Todo.factory('TaskService', [
+var TaskService = Todo.factory('TaskService', [
   'Restangular', function(Restangular) {
     return {
       create: function(task) {
@@ -19,4 +18,4 @@ var TodoService = Todo.factory('TaskService', [
   }
 ]);
 
-module.exports = TodoService;
+module.exports = TaskService;

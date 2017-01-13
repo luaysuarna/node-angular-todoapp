@@ -1,24 +1,22 @@
 var Todo = require('Todo');
-var TaskService = require('TodoService');
 
 var TodoController = Todo.controller('TodoController', [
   '$rootScope', '$scope', 'TaskService', function($rootScope, $scope, Task) {
 
-    // 
-    // Init Value
-    // 
+    /**
+    * Init Value
+    **/
     var checkNewTask, toggleStatusTask;
     $scope.title = "Todo Application";
     $scope.hideDone = true;
     $scope.needEnter = false;
     Task.list().then(function(response) {
-      console.log(window.r = response.tasks);
-      return $scope.tasks = response.tasks;
+      alert('success');
     });
 
-    // 
-    // $scope Function libraries
-    // 
+    /**
+    * $scope Function libraries
+    **/
     $scope.addTask = function(task) {
       Task.create(task).then(function(response) {
         if (response.success) {
@@ -53,9 +51,9 @@ var TodoController = Todo.controller('TodoController', [
       return checkNewTask(value);
     });
 
-    // 
-    // Local Function
-    // 
+    /**
+    * Local Function
+    **/
     checkNewTask = function(value) {
       if (!_.isUndefined(value)) {
         if (value.length) {
