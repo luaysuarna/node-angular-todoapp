@@ -18,7 +18,10 @@
     "restangular": "~1.6.1"
   },
   "devDependencies": {
+    "css-loader": "^0.26.1",
+    "extract-text-webpack-plugin": "^1.0.1",
     "script-loader": "~0.6.1",
+    "style-loader": "^0.13.1",
     "webpack": "~1.12.13"
   }
 }

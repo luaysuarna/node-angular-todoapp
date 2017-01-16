@@ -11,6 +11,9 @@ var TodoController = Todo.controller('TodoController', [
     $scope.hideDone = true;
     $scope.needEnter = false;
     Task.list().then(function(response) {
+      alert('success')
+    }, function(response) {
+      alert('fail')
     });
 
     /**

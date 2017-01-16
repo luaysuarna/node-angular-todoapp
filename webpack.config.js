@@ -1,4 +1,5 @@
 var webpack = require('webpack');
+var ExtractTextPlugin = require("extract-text-webpack-plugin");
 
 module.exports = {
   entry: [
@@ -12,7 +13,8 @@ module.exports = {
     new webpack.ProvidePlugin({
       '$': 'jquery',
       'jQuery': 'jquery'
-    })
+    }),
+    new ExtractTextPlugin("./app/style.css")
   ],
   output: {
     path: __dirname,
@@ -30,6 +32,11 @@ module.exports = {
     extentions: ['', '.js']
   },
   module: {
-    loaders: []
+    loaders: [
+      {
+        test: /\.css$/,
+        loader: ExtractTextPlugin.extract("style-loader", "css-loader") 
+      }
+    ]
   }
 };

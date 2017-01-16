@@ -1,5 +1,3 @@
-// import style from '.app/styles/style.scss';
-
 /**
 * Angular Plugins
 **/
