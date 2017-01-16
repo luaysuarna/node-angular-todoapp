@@ -1,4 +1,4 @@
-import 'style!css!bootstrap/dist/css/bootstrap.min.css';
+// require('./styles/style.scss');
 
 /**
 * Angular Plugins

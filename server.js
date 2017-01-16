@@ -19,7 +19,8 @@ app.use(function (req, res, next) {
   // Pass to next layer of middleware
   next();
 });
-app.use(express.static('app/views/'));
+app.use(express.static('bower_components'));
+app.use(express.static('app'));
 
 app.listen(PORT, function(){
   console.log('Server up using port ' + PORT);

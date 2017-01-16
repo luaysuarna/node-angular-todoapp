@@ -16,12 +16,11 @@
     "lodash": "~4.17.4",
     "angular-ui-router": "~0.3.2",
     "restangular": "~1.6.1",
-    "cors": "~2.8.1"
+    "cors": "~2.8.1",
+    "normalize.css": "~5.0.0"
   },
   "devDependencies": {
     "webpack": "~1.12.13",
-    "script-loader": "~0.6.1",
-    "style-loader": "~0.13.0",
-    "css-loader": "~0.23.1"
+    "script-loader": "~0.6.1"
   }
 }

@@ -1,0 +1,21 @@
+{
+  "name": "angular-todo-app",
+  "description": "Angular Simplet Todo App",
+  "main": "index.js",
+  "authors": [
+    "Luay Suarna"
+  ],
+  "license": "BSD-2-Clause",
+  "homepage": "https://github.com/luaysuarna/node-angular-todoapp",
+  "private": true,
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "bower_components",
+    "test",
+    "tests"
+  ],
+  "dependencies": {
+    "bootstrap": "^3.3.7"
+  }
+}
