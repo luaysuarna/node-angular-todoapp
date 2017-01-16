@@ -8,13 +8,13 @@ Todo.config([
     homeState = {
       name: 'home',
       url: '/',
-      templateUrl: 'homes/index.html'
+      templateUrl: 'views/homes/index.html'
     };
     todoState = {
       name: 'todo',
       url: '/todos',
       controller: 'TodoController',
-      templateUrl: 'todos/index.html'
+      templateUrl: 'views/todos/index.html'
     };
 
     $stateProvider.state(homeState);

@@ -16,7 +16,7 @@ module.exports = {
   ],
   output: {
     path: __dirname,
-    filename: './app/bundle.js'
+    filename: './bundle.js'
   },
   resolve: {
     root: __dirname,
@@ -30,11 +30,6 @@ module.exports = {
     extentions: ['', '.js']
   },
   module: {
-    loaders: [
-      {
-        test: /\.scss$/,
-        loaders: [ 'style', 'css?sourceMap', 'sass?sourceMap' ]
-      }
-    ]
-  } 
+    loaders: []
+  }
 };

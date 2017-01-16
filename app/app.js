@@ -1,4 +1,4 @@
-// require('./styles/style.scss');
+// import style from '.app/styles/style.scss';
 
 /**
 * Angular Plugins
