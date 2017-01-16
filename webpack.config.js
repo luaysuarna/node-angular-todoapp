@@ -16,7 +16,7 @@ module.exports = {
   ],
   output: {
     path: __dirname,
-    filename: './bundle.js'
+    filename: './app/bundle.js'
   },
   resolve: {
     root: __dirname,
