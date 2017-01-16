@@ -79,7 +79,7 @@
 /* 4 */
 /***/ function(module, exports, __webpack_require__) {
 
-	// require('./styles/style.scss');
+	// import style from '.app/styles/style.scss';
 
 	/**
 	* Angular Plugins
@@ -55970,13 +55970,13 @@
 	    homeState = {
 	      name: 'home',
 	      url: '/',
-	      templateUrl: 'homes/index.html'
+	      templateUrl: 'views/homes/index.html'
 	    };
 	    todoState = {
 	      name: 'todo',
 	      url: '/todos',
 	      controller: 'TodoController',
-	      templateUrl: 'todos/index.html'
+	      templateUrl: 'views/todos/index.html'
 	    };
 
 	    $stateProvider.state(homeState);
@@ -56008,7 +56008,6 @@
 	    $scope.hideDone = true;
 	    $scope.needEnter = false;
 	    Task.list().then(function(response) {
-	      alert('success');
 	    });
 
 	    /**

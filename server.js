@@ -21,6 +21,9 @@ app.use(function (req, res, next) {
 });
 app.use(express.static('bower_components'));
 app.use(express.static('app'));
+app.use(function(req, res) {
+  res.sendfile(__dirname + '/app/index.html');
+});
 
 app.listen(PORT, function(){
   console.log('Server up using port ' + PORT);

@@ -10,22 +10,15 @@
   "author": "Luay Suarna",
   "license": "BSD-2-Clause",
   "dependencies": {
-    "express": "~4.14.0",
     "angular": "~1.5.10",
+    "angular-ui-router": "~0.3.2",
+    "express": "~4.14.0",
     "jquery": "~3.1.1",
     "lodash": "~4.17.4",
-    "angular-ui-router": "~0.3.2",
-    "restangular": "~1.6.1",
-    "cors": "~2.8.1",
-    "normalize.css": "~5.0.0"
+    "restangular": "~1.6.1"
   },
   "devDependencies": {
-    "webpack": "~1.12.13",
     "script-loader": "~0.6.1",
-    "style-loader": "~0.13.1",
-    "css-loader": "~0.26.1",
-    "node-sass": "~4.3.0",
-    "sass-loader": "~4.1.1",
-    "extract-text-webpack-plugin": "~1.0.1"
+    "webpack": "~1.12.13"
   }
 }
