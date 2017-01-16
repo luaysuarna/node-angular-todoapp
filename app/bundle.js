@@ -56006,6 +56006,7 @@
 	    $scope.hideDone = true;
 	    $scope.needEnter = false;
 	    Task.list().then(function(response) {
+	      $scope.tasks = response.tasks;
 	    });
 
 	    /**
