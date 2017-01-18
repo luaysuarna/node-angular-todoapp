@@ -1,9 +1,26 @@
-<div class="jumbotron">
-  <h1>Welcome To Application</h1>
-  <p>Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod
-  tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam,
-  quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo
-  consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse
-  cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non
-  proident, sunt in culpa qui officia deserunt mollit anim id est laborum.</p>
+<div class="row">
+  <div class="col-sm-4 col-sm-offset-4">
+    <form ng-init='user' ng-submit='login(user)'>
+      <ul class="list-group">
+        <li class="list-group-item">
+          <strong>Please Sign In</strong>
+        </li>
+        <li class="list-group-item">
+          <input type="email" name="email" class="form-control" id='email' placeholder="Email" ng-model="user.email">
+        </li>
+        <li class="list-group-item">
+          <input type="password" name="password" class="form-control" id='password' placeholder="Password" ng-model="user.password">
+        </li>
+        <li class="list-group-item">
+          <div class="pull-right">
+            <button class='btn btn-primary btn-sm' style='position: relative; z-index: 99999;'>Submit</button>
+          </div>
+          <div class="checkbox">
+            <input type="checkbox" name="remember" id='remember_me' ng-model="user.remember_me">
+            <label for='remember_me'><small>Remember me</small></label>
+          </div>
+        </li>
+      </ul>
+    </form>
+  </div>
 </div>

@@ -23,6 +23,9 @@ module.exports = {
   resolve: {
     root: __dirname,
     alias: {
+      AppController: 'app/javascripts/controllers/app.controller.js',
+      AuthService: 'app/javascripts/services/auth.service.js',
+
       Todo: 'app/javascripts/todo.module.js',
       TodoConfig: 'app/javascripts/config/config.js',
       TodoConfigRoutes: 'app/javascripts/config/routes.js',

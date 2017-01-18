@@ -1,9 +1,17 @@
 var Todo = angular.module('Todo', [
   'ui.router',
-  'restangular'
+  'restangular',
+  'ngSanitize',
+  'ngToast',
+  'ngCookies'
 ]).run(
-  function($rootScope) {
+  function($rootScope, $cookies) {
+    /**
+    * Init values
+    **/
     $rootScope._ = _;
+    $rootScope.userSignedIn = !_.isUndefined($cookies.get('auth_token'));
+    $rootScope.currentUser  = {};
   }
 );
 

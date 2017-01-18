@@ -4,6 +4,9 @@
 require('angular');
 require('restangular');
 require('angular-ui-router');
+require('ng-toast');
+require('angular-sanitize');
+require('angular-cookies');
 
 /**
 * Angular Configurations
@@ -21,9 +24,11 @@ require('TodoConfigRoutes');
 /**
 * Angular Controllers
 **/
+require('AppController');
 require('TodoController');
 
 /**
 * Angular Services
 **/
 require('TaskService');
+require('AuthService');

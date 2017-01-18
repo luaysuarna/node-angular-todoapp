@@ -50,3 +50,19 @@
   margin-top: 4px;
   display: block !important;
 }
+
+.checkbox {
+  margin: 5px 0px;
+}
+
+.checkbox input[type=checkbox] {
+  margin-left: 0px;
+}
+
+.signedWaiting {
+  display: none;
+}
+
+.signedShow {
+  display: block;
+}

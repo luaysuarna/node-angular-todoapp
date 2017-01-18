@@ -1,8 +1,7 @@
 var Todo = require('Todo');
 
 var TodoController = Todo.controller('TodoController', [
-  '$rootScope', '$scope', 'TaskService', function($rootScope, $scope, Task) {
-
+  '$rootScope', '$scope', 'TaskService', '$cookies', function($rootScope, $scope, Task, $cookies) {
     /**
     * Init Value
     **/
@@ -10,9 +9,15 @@ var TodoController = Todo.controller('TodoController', [
     $scope.title = "Todo Application";
     $scope.hideDone = true;
     $scope.needEnter = false;
-    Task.list().then(function(response) {
-      $scope.tasks = response.tasks;
-    });
+
+    /**
+    * Authentications Init
+    **/
+    if($rootScope.userSignedIn) {
+      Task.list().then(function(response) {
+        $scope.tasks = response.tasks;
+      });
+    }
 
     /**
     * $scope Function libraries

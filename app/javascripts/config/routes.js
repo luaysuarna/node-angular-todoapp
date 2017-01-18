@@ -8,6 +8,7 @@ Todo.config([
     homeState = {
       name: 'home',
       url: '/',
+      controller: 'AppController',
       templateUrl: 'views/homes/index.html'
     };
     todoState = {

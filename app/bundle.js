@@ -85,12 +85,15 @@
 	__webpack_require__(5);
 	__webpack_require__(7);
 	__webpack_require__(10);
+	__webpack_require__(11);
+	__webpack_require__(12);
+	__webpack_require__(14);
 
 	/**
 	* Angular Configurations
 	**/
-	__webpack_require__(11);
-	__webpack_require__(13);
+	__webpack_require__(16);
+	__webpack_require__(18);
 
 	/**
 	* Angular List Module
@@ -102,12 +105,14 @@
 	/**
 	* Angular Controllers
 	**/
-	__webpack_require__(14);
+	__webpack_require__(19);
+	__webpack_require__(20);
 
 	/**
 	* Angular Services
 	**/
-	__webpack_require__(16);
+	__webpack_require__(22);
+	__webpack_require__(23);
 
 
 /***/ },
@@ -55925,9 +55930,1396 @@
 
 /***/ },
 /* 11 */
+/***/ function(module, exports) {
+
+	/*!
+	 * ngToast v2.0.0 (http://tameraydin.github.io/ngToast)
+	 * Copyright 2016 Tamer Aydin (http://tamerayd.in)
+	 * Licensed under MIT (http://tameraydin.mit-license.org/)
+	 */
+
+	(function(window, angular, undefined) {
+	  'use strict';
+
+	  angular.module('ngToast.provider', [])
+	    .provider('ngToast', [
+	      function() {
+	        var messages = [],
+	            messageStack = [];
+
+	        var defaults = {
+	          animation: false,
+	          className: 'success',
+	          additionalClasses: null,
+	          dismissOnTimeout: true,
+	          timeout: 4000,
+	          dismissButton: false,
+	          dismissButtonHtml: '&times;',
+	          dismissOnClick: true,
+	          onDismiss: null,
+	          compileContent: false,
+	          combineDuplications: false,
+	          horizontalPosition: 'right', // right, center, left
+	          verticalPosition: 'top', // top, bottom,
+	          maxNumber: 0,
+	          newestOnTop: true
+	        };
+
+	        function Message(msg) {
+	          var id = Math.floor(Math.random()*1000);
+	          while (messages.indexOf(id) > -1) {
+	            id = Math.floor(Math.random()*1000);
+	          }
+
+	          this.id = id;
+	          this.count = 0;
+	          this.animation = defaults.animation;
+	          this.className = defaults.className;
+	          this.additionalClasses = defaults.additionalClasses;
+	          this.dismissOnTimeout = defaults.dismissOnTimeout;
+	          this.timeout = defaults.timeout;
+	          this.dismissButton = defaults.dismissButton;
+	          this.dismissButtonHtml = defaults.dismissButtonHtml;
+	          this.dismissOnClick = defaults.dismissOnClick;
+	          this.onDismiss = defaults.onDismiss;
+	          this.compileContent = defaults.compileContent;
+
+	          angular.extend(this, msg);
+	        }
+
+	        this.configure = function(config) {
+	          angular.extend(defaults, config);
+	        };
+
+	        this.$get = [function() {
+	          var _createWithClassName = function(className, msg) {
+	            msg = (typeof msg === 'object') ? msg : {content: msg};
+	            msg.className = className;
+
+	            return this.create(msg);
+	          };
+
+	          return {
+	            settings: defaults,
+	            messages: messages,
+	            dismiss: function(id) {
+	              if (id) {
+	                for (var i = messages.length - 1; i >= 0; i--) {
+	                  if (messages[i].id === id) {
+	                    messages.splice(i, 1);
+	                    messageStack.splice(messageStack.indexOf(id), 1);
+	                    return;
+	                  }
+	                }
+
+	              } else {
+	                while(messages.length > 0) {
+	                  messages.pop();
+	                }
+	                messageStack = [];
+	              }
+	            },
+	            create: function(msg) {
+	              msg = (typeof msg === 'object') ? msg : {content: msg};
+
+	              if (defaults.combineDuplications) {
+	                for (var i = messageStack.length - 1; i >= 0; i--) {
+	                  var _msg = messages[i];
+	                  var _className = msg.className || 'success';
+
+	                  if (_msg.content === msg.content &&
+	                      _msg.className === _className) {
+	                    messages[i].count++;
+	                    return;
+	                  }
+	                }
+	              }
+
+	              if (defaults.maxNumber > 0 &&
+	                  messageStack.length >= defaults.maxNumber) {
+	                this.dismiss(messageStack[0]);
+	              }
+
+	              var newMsg = new Message(msg);
+	              messages[defaults.newestOnTop ? 'unshift' : 'push'](newMsg);
+	              messageStack.push(newMsg.id);
+
+	              return newMsg.id;
+	            },
+	            success: function(msg) {
+	              return _createWithClassName.call(this, 'success', msg);
+	            },
+	            info: function(msg) {
+	              return _createWithClassName.call(this, 'info', msg);
+	            },
+	            warning: function(msg) {
+	              return _createWithClassName.call(this, 'warning', msg);
+	            },
+	            danger: function(msg) {
+	              return _createWithClassName.call(this, 'danger', msg);
+	            }
+	          };
+	        }];
+	      }
+	    ]);
+
+	})(window, window.angular);
+
+	(function(window, angular) {
+	  'use strict';
+
+	  angular.module('ngToast.directives', ['ngToast.provider'])
+	    .run(['$templateCache',
+	      function($templateCache) {
+	        $templateCache.put('ngToast/toast.html',
+	          '<div class="ng-toast ng-toast--{{hPos}} ng-toast--{{vPos}} {{animation ? \'ng-toast--animate-\' + animation : \'\'}}">' +
+	            '<ul class="ng-toast__list">' +
+	              '<toast-message ng-repeat="message in messages" ' +
+	                'message="message" count="message.count">' +
+	                '<span ng-bind-html="message.content"></span>' +
+	              '</toast-message>' +
+	            '</ul>' +
+	          '</div>');
+	        $templateCache.put('ngToast/toastMessage.html',
+	          '<li class="ng-toast__message {{message.additionalClasses}}"' +
+	            'ng-mouseenter="onMouseEnter()"' +
+	            'ng-mouseleave="onMouseLeave()">' +
+	            '<div class="alert alert-{{message.className}}" ' +
+	              'ng-class="{\'alert-dismissible\': message.dismissButton}">' +
+	              '<button type="button" class="close" ' +
+	                'ng-if="message.dismissButton" ' +
+	                'ng-bind-html="message.dismissButtonHtml" ' +
+	                'ng-click="!message.dismissOnClick && dismiss()">' +
+	              '</button>' +
+	              '<span ng-if="count" class="ng-toast__message__count">' +
+	                '{{count + 1}}' +
+	              '</span>' +
+	              '<span ng-if="!message.compileContent" ng-transclude></span>' +
+	            '</div>' +
+	          '</li>');
+	      }
+	    ])
+	    .directive('toast', ['ngToast', '$templateCache', '$log',
+	      function(ngToast, $templateCache, $log) {
+	        return {
+	          replace: true,
+	          restrict: 'EA',
+	          templateUrl: 'ngToast/toast.html',
+	          compile: function(tElem, tAttrs) {
+	            if (tAttrs.template) {
+	              var template = $templateCache.get(tAttrs.template);
+	              if (template) {
+	                tElem.replaceWith(template);
+	              } else {
+	                $log.warn('ngToast: Provided template could not be loaded. ' +
+	                  'Please be sure that it is populated before the <toast> element is represented.');
+	              }
+	            }
+
+	            return function(scope) {
+	              scope.hPos = ngToast.settings.horizontalPosition;
+	              scope.vPos = ngToast.settings.verticalPosition;
+	              scope.animation = ngToast.settings.animation;
+	              scope.messages = ngToast.messages;
+	            };
+	          }
+	        };
+	      }
+	    ])
+	    .directive('toastMessage', ['$timeout', '$compile', 'ngToast',
+	      function($timeout, $compile, ngToast) {
+	        return {
+	          replace: true,
+	          transclude: true,
+	          restrict: 'EA',
+	          scope: {
+	            message: '=',
+	            count: '='
+	          },
+	          controller: ['$scope', 'ngToast', function($scope, ngToast) {
+	            $scope.dismiss = function() {
+	              ngToast.dismiss($scope.message.id);
+	            };
+	          }],
+	          templateUrl: 'ngToast/toastMessage.html',
+	          link: function(scope, element, attrs, ctrl, transclude) {
+	            element.attr('data-message-id', scope.message.id);
+
+	            var dismissTimeout;
+	            var scopeToBind = scope.message.compileContent;
+
+	            scope.cancelTimeout = function() {
+	              $timeout.cancel(dismissTimeout);
+	            };
+
+	            scope.startTimeout = function() {
+	              if (scope.message.dismissOnTimeout) {
+	                dismissTimeout = $timeout(function() {
+	                  ngToast.dismiss(scope.message.id);
+	                }, scope.message.timeout);
+	              }
+	            };
+
+	            scope.onMouseEnter = function() {
+	              scope.cancelTimeout();
+	            };
+
+	            scope.onMouseLeave = function() {
+	              scope.startTimeout();
+	            };
+
+	            if (scopeToBind) {
+	              var transcludedEl;
+
+	              transclude(scope, function(clone) {
+	                transcludedEl = clone;
+	                element.children().append(transcludedEl);
+	              });
+
+	              $timeout(function() {
+	                $compile(transcludedEl.contents())
+	                  (typeof scopeToBind === 'boolean' ?
+	                    scope.$parent : scopeToBind, function(compiledClone) {
+	                    transcludedEl.replaceWith(compiledClone);
+	                  });
+	              }, 0);
+	            }
+
+	            scope.startTimeout();
+
+	            if (scope.message.dismissOnClick) {
+	              element.bind('click', function() {
+	                ngToast.dismiss(scope.message.id);
+	                scope.$apply();
+	              });
+	            }
+
+	            if (scope.message.onDismiss) {
+	              scope.$on('$destroy',
+	                scope.message.onDismiss.bind(scope.message));
+	            }
+	          }
+	        };
+	      }
+	    ]);
+
+	})(window, window.angular);
+
+	(function(window, angular) {
+	  'use strict';
+
+	  angular
+	    .module('ngToast', [
+	      'ngSanitize',
+	      'ngToast.directives',
+	      'ngToast.provider'
+	    ]);
+
+	})(window, window.angular);
+
+
+/***/ },
+/* 12 */
 /***/ function(module, exports, __webpack_require__) {
 
-	var Todo = __webpack_require__(12);
+	__webpack_require__(13);
+	module.exports = 'ngSanitize';
+
+
+/***/ },
+/* 13 */
+/***/ function(module, exports) {
+
+	/**
+	 * @license AngularJS v1.6.1
+	 * (c) 2010-2016 Google, Inc. http://angularjs.org
+	 * License: MIT
+	 */
+	(function(window, angular) {'use strict';
+
+	/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
+	 *     Any commits to this file should be reviewed with security in mind.  *
+	 *   Changes to this file can potentially create security vulnerabilities. *
+	 *          An approval from 2 Core members with history of modifying      *
+	 *                         this file is required.                          *
+	 *                                                                         *
+	 *  Does the change somehow allow for arbitrary javascript to be executed? *
+	 *    Or allows for someone to change the prototype of built-in objects?   *
+	 *     Or gives undesired access to variables likes document or window?    *
+	 * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
+
+	var $sanitizeMinErr = angular.$$minErr('$sanitize');
+	var bind;
+	var extend;
+	var forEach;
+	var isDefined;
+	var lowercase;
+	var noop;
+	var htmlParser;
+	var htmlSanitizeWriter;
+
+	/**
+	 * @ngdoc module
+	 * @name ngSanitize
+	 * @description
+	 *
+	 * # ngSanitize
+	 *
+	 * The `ngSanitize` module provides functionality to sanitize HTML.
+	 *
+	 *
+	 * <div doc-module-components="ngSanitize"></div>
+	 *
+	 * See {@link ngSanitize.$sanitize `$sanitize`} for usage.
+	 */
+
+	/**
+	 * @ngdoc service
+	 * @name $sanitize
+	 * @kind function
+	 *
+	 * @description
+	 *   Sanitizes an html string by stripping all potentially dangerous tokens.
+	 *
+	 *   The input is sanitized by parsing the HTML into tokens. All safe tokens (from a whitelist) are
+	 *   then serialized back to properly escaped html string. This means that no unsafe input can make
+	 *   it into the returned string.
+	 *
+	 *   The whitelist for URL sanitization of attribute values is configured using the functions
+	 *   `aHrefSanitizationWhitelist` and `imgSrcSanitizationWhitelist` of {@link ng.$compileProvider
+	 *   `$compileProvider`}.
+	 *
+	 *   The input may also contain SVG markup if this is enabled via {@link $sanitizeProvider}.
+	 *
+	 * @param {string} html HTML input.
+	 * @returns {string} Sanitized HTML.
+	 *
+	 * @example
+	   <example module="sanitizeExample" deps="angular-sanitize.js" name="sanitize-service">
+	   <file name="index.html">
+	     <script>
+	         angular.module('sanitizeExample', ['ngSanitize'])
+	           .controller('ExampleController', ['$scope', '$sce', function($scope, $sce) {
+	             $scope.snippet =
+	               '<p style="color:blue">an html\n' +
+	               '<em onmouseover="this.textContent=\'PWN3D!\'">click here</em>\n' +
+	               'snippet</p>';
+	             $scope.deliberatelyTrustDangerousSnippet = function() {
+	               return $sce.trustAsHtml($scope.snippet);
+	             };
+	           }]);
+	     </script>
+	     <div ng-controller="ExampleController">
+	        Snippet: <textarea ng-model="snippet" cols="60" rows="3"></textarea>
+	       <table>
+	         <tr>
+	           <td>Directive</td>
+	           <td>How</td>
+	           <td>Source</td>
+	           <td>Rendered</td>
+	         </tr>
+	         <tr id="bind-html-with-sanitize">
+	           <td>ng-bind-html</td>
+	           <td>Automatically uses $sanitize</td>
+	           <td><pre>&lt;div ng-bind-html="snippet"&gt;<br/>&lt;/div&gt;</pre></td>
+	           <td><div ng-bind-html="snippet"></div></td>
+	         </tr>
+	         <tr id="bind-html-with-trust">
+	           <td>ng-bind-html</td>
+	           <td>Bypass $sanitize by explicitly trusting the dangerous value</td>
+	           <td>
+	           <pre>&lt;div ng-bind-html="deliberatelyTrustDangerousSnippet()"&gt;
+	&lt;/div&gt;</pre>
+	           </td>
+	           <td><div ng-bind-html="deliberatelyTrustDangerousSnippet()"></div></td>
+	         </tr>
+	         <tr id="bind-default">
+	           <td>ng-bind</td>
+	           <td>Automatically escapes</td>
+	           <td><pre>&lt;div ng-bind="snippet"&gt;<br/>&lt;/div&gt;</pre></td>
+	           <td><div ng-bind="snippet"></div></td>
+	         </tr>
+	       </table>
+	       </div>
+	   </file>
+	   <file name="protractor.js" type="protractor">
+	     it('should sanitize the html snippet by default', function() {
+	       expect(element(by.css('#bind-html-with-sanitize div')).getAttribute('innerHTML')).
+	         toBe('<p>an html\n<em>click here</em>\nsnippet</p>');
+	     });
+
+	     it('should inline raw snippet if bound to a trusted value', function() {
+	       expect(element(by.css('#bind-html-with-trust div')).getAttribute('innerHTML')).
+	         toBe("<p style=\"color:blue\">an html\n" +
+	              "<em onmouseover=\"this.textContent='PWN3D!'\">click here</em>\n" +
+	              "snippet</p>");
+	     });
+
+	     it('should escape snippet without any filter', function() {
+	       expect(element(by.css('#bind-default div')).getAttribute('innerHTML')).
+	         toBe("&lt;p style=\"color:blue\"&gt;an html\n" +
+	              "&lt;em onmouseover=\"this.textContent='PWN3D!'\"&gt;click here&lt;/em&gt;\n" +
+	              "snippet&lt;/p&gt;");
+	     });
+
+	     it('should update', function() {
+	       element(by.model('snippet')).clear();
+	       element(by.model('snippet')).sendKeys('new <b onclick="alert(1)">text</b>');
+	       expect(element(by.css('#bind-html-with-sanitize div')).getAttribute('innerHTML')).
+	         toBe('new <b>text</b>');
+	       expect(element(by.css('#bind-html-with-trust div')).getAttribute('innerHTML')).toBe(
+	         'new <b onclick="alert(1)">text</b>');
+	       expect(element(by.css('#bind-default div')).getAttribute('innerHTML')).toBe(
+	         "new &lt;b onclick=\"alert(1)\"&gt;text&lt;/b&gt;");
+	     });
+	   </file>
+	   </example>
+	 */
+
+
+	/**
+	 * @ngdoc provider
+	 * @name $sanitizeProvider
+	 * @this
+	 *
+	 * @description
+	 * Creates and configures {@link $sanitize} instance.
+	 */
+	function $SanitizeProvider() {
+	  var svgEnabled = false;
+
+	  this.$get = ['$$sanitizeUri', function($$sanitizeUri) {
+	    if (svgEnabled) {
+	      extend(validElements, svgElements);
+	    }
+	    return function(html) {
+	      var buf = [];
+	      htmlParser(html, htmlSanitizeWriter(buf, function(uri, isImage) {
+	        return !/^unsafe:/.test($$sanitizeUri(uri, isImage));
+	      }));
+	      return buf.join('');
+	    };
+	  }];
+
+
+	  /**
+	   * @ngdoc method
+	   * @name $sanitizeProvider#enableSvg
+	   * @kind function
+	   *
+	   * @description
+	   * Enables a subset of svg to be supported by the sanitizer.
+	   *
+	   * <div class="alert alert-warning">
+	   *   <p>By enabling this setting without taking other precautions, you might expose your
+	   *   application to click-hijacking attacks. In these attacks, sanitized svg elements could be positioned
+	   *   outside of the containing element and be rendered over other elements on the page (e.g. a login
+	   *   link). Such behavior can then result in phishing incidents.</p>
+	   *
+	   *   <p>To protect against these, explicitly setup `overflow: hidden` css rule for all potential svg
+	   *   tags within the sanitized content:</p>
+	   *
+	   *   <br>
+	   *
+	   *   <pre><code>
+	   *   .rootOfTheIncludedContent svg {
+	   *     overflow: hidden !important;
+	   *   }
+	   *   </code></pre>
+	   * </div>
+	   *
+	   * @param {boolean=} flag Enable or disable SVG support in the sanitizer.
+	   * @returns {boolean|ng.$sanitizeProvider} Returns the currently configured value if called
+	   *    without an argument or self for chaining otherwise.
+	   */
+	  this.enableSvg = function(enableSvg) {
+	    if (isDefined(enableSvg)) {
+	      svgEnabled = enableSvg;
+	      return this;
+	    } else {
+	      return svgEnabled;
+	    }
+	  };
+
+	  //////////////////////////////////////////////////////////////////////////////////////////////////
+	  // Private stuff
+	  //////////////////////////////////////////////////////////////////////////////////////////////////
+
+	  bind = angular.bind;
+	  extend = angular.extend;
+	  forEach = angular.forEach;
+	  isDefined = angular.isDefined;
+	  lowercase = angular.lowercase;
+	  noop = angular.noop;
+
+	  htmlParser = htmlParserImpl;
+	  htmlSanitizeWriter = htmlSanitizeWriterImpl;
+
+	  // Regular Expressions for parsing tags and attributes
+	  var SURROGATE_PAIR_REGEXP = /[\uD800-\uDBFF][\uDC00-\uDFFF]/g,
+	    // Match everything outside of normal chars and " (quote character)
+	    NON_ALPHANUMERIC_REGEXP = /([^#-~ |!])/g;
+
+
+	  // Good source of info about elements and attributes
+	  // http://dev.w3.org/html5/spec/Overview.html#semantics
+	  // http://simon.html5.org/html-elements
+
+	  // Safe Void Elements - HTML5
+	  // http://dev.w3.org/html5/spec/Overview.html#void-elements
+	  var voidElements = toMap('area,br,col,hr,img,wbr');
+
+	  // Elements that you can, intentionally, leave open (and which close themselves)
+	  // http://dev.w3.org/html5/spec/Overview.html#optional-tags
+	  var optionalEndTagBlockElements = toMap('colgroup,dd,dt,li,p,tbody,td,tfoot,th,thead,tr'),
+	      optionalEndTagInlineElements = toMap('rp,rt'),
+	      optionalEndTagElements = extend({},
+	                                              optionalEndTagInlineElements,
+	                                              optionalEndTagBlockElements);
+
+	  // Safe Block Elements - HTML5
+	  var blockElements = extend({}, optionalEndTagBlockElements, toMap('address,article,' +
+	          'aside,blockquote,caption,center,del,dir,div,dl,figure,figcaption,footer,h1,h2,h3,h4,h5,' +
+	          'h6,header,hgroup,hr,ins,map,menu,nav,ol,pre,section,table,ul'));
+
+	  // Inline Elements - HTML5
+	  var inlineElements = extend({}, optionalEndTagInlineElements, toMap('a,abbr,acronym,b,' +
+	          'bdi,bdo,big,br,cite,code,del,dfn,em,font,i,img,ins,kbd,label,map,mark,q,ruby,rp,rt,s,' +
+	          'samp,small,span,strike,strong,sub,sup,time,tt,u,var'));
+
+	  // SVG Elements
+	  // https://wiki.whatwg.org/wiki/Sanitization_rules#svg_Elements
+	  // Note: the elements animate,animateColor,animateMotion,animateTransform,set are intentionally omitted.
+	  // They can potentially allow for arbitrary javascript to be executed. See #11290
+	  var svgElements = toMap('circle,defs,desc,ellipse,font-face,font-face-name,font-face-src,g,glyph,' +
+	          'hkern,image,linearGradient,line,marker,metadata,missing-glyph,mpath,path,polygon,polyline,' +
+	          'radialGradient,rect,stop,svg,switch,text,title,tspan');
+
+	  // Blocked Elements (will be stripped)
+	  var blockedElements = toMap('script,style');
+
+	  var validElements = extend({},
+	                                     voidElements,
+	                                     blockElements,
+	                                     inlineElements,
+	                                     optionalEndTagElements);
+
+	  //Attributes that have href and hence need to be sanitized
+	  var uriAttrs = toMap('background,cite,href,longdesc,src,xlink:href');
+
+	  var htmlAttrs = toMap('abbr,align,alt,axis,bgcolor,border,cellpadding,cellspacing,class,clear,' +
+	      'color,cols,colspan,compact,coords,dir,face,headers,height,hreflang,hspace,' +
+	      'ismap,lang,language,nohref,nowrap,rel,rev,rows,rowspan,rules,' +
+	      'scope,scrolling,shape,size,span,start,summary,tabindex,target,title,type,' +
+	      'valign,value,vspace,width');
+
+	  // SVG attributes (without "id" and "name" attributes)
+	  // https://wiki.whatwg.org/wiki/Sanitization_rules#svg_Attributes
+	  var svgAttrs = toMap('accent-height,accumulate,additive,alphabetic,arabic-form,ascent,' +
+	      'baseProfile,bbox,begin,by,calcMode,cap-height,class,color,color-rendering,content,' +
+	      'cx,cy,d,dx,dy,descent,display,dur,end,fill,fill-rule,font-family,font-size,font-stretch,' +
+	      'font-style,font-variant,font-weight,from,fx,fy,g1,g2,glyph-name,gradientUnits,hanging,' +
+	      'height,horiz-adv-x,horiz-origin-x,ideographic,k,keyPoints,keySplines,keyTimes,lang,' +
+	      'marker-end,marker-mid,marker-start,markerHeight,markerUnits,markerWidth,mathematical,' +
+	      'max,min,offset,opacity,orient,origin,overline-position,overline-thickness,panose-1,' +
+	      'path,pathLength,points,preserveAspectRatio,r,refX,refY,repeatCount,repeatDur,' +
+	      'requiredExtensions,requiredFeatures,restart,rotate,rx,ry,slope,stemh,stemv,stop-color,' +
+	      'stop-opacity,strikethrough-position,strikethrough-thickness,stroke,stroke-dasharray,' +
+	      'stroke-dashoffset,stroke-linecap,stroke-linejoin,stroke-miterlimit,stroke-opacity,' +
+	      'stroke-width,systemLanguage,target,text-anchor,to,transform,type,u1,u2,underline-position,' +
+	      'underline-thickness,unicode,unicode-range,units-per-em,values,version,viewBox,visibility,' +
+	      'width,widths,x,x-height,x1,x2,xlink:actuate,xlink:arcrole,xlink:role,xlink:show,xlink:title,' +
+	      'xlink:type,xml:base,xml:lang,xml:space,xmlns,xmlns:xlink,y,y1,y2,zoomAndPan', true);
+
+	  var validAttrs = extend({},
+	                                  uriAttrs,
+	                                  svgAttrs,
+	                                  htmlAttrs);
+
+	  function toMap(str, lowercaseKeys) {
+	    var obj = {}, items = str.split(','), i;
+	    for (i = 0; i < items.length; i++) {
+	      obj[lowercaseKeys ? lowercase(items[i]) : items[i]] = true;
+	    }
+	    return obj;
+	  }
+
+	  var inertBodyElement;
+	  (function(window) {
+	    var doc;
+	    if (window.document && window.document.implementation) {
+	      doc = window.document.implementation.createHTMLDocument('inert');
+	    } else {
+	      throw $sanitizeMinErr('noinert', 'Can\'t create an inert html document');
+	    }
+	    var docElement = doc.documentElement || doc.getDocumentElement();
+	    var bodyElements = docElement.getElementsByTagName('body');
+
+	    // usually there should be only one body element in the document, but IE doesn't have any, so we need to create one
+	    if (bodyElements.length === 1) {
+	      inertBodyElement = bodyElements[0];
+	    } else {
+	      var html = doc.createElement('html');
+	      inertBodyElement = doc.createElement('body');
+	      html.appendChild(inertBodyElement);
+	      doc.appendChild(html);
+	    }
+	  })(window);
+
+	  /**
+	   * @example
+	   * htmlParser(htmlString, {
+	   *     start: function(tag, attrs) {},
+	   *     end: function(tag) {},
+	   *     chars: function(text) {},
+	   *     comment: function(text) {}
+	   * });
+	   *
+	   * @param {string} html string
+	   * @param {object} handler
+	   */
+	  function htmlParserImpl(html, handler) {
+	    if (html === null || html === undefined) {
+	      html = '';
+	    } else if (typeof html !== 'string') {
+	      html = '' + html;
+	    }
+	    inertBodyElement.innerHTML = html;
+
+	    //mXSS protection
+	    var mXSSAttempts = 5;
+	    do {
+	      if (mXSSAttempts === 0) {
+	        throw $sanitizeMinErr('uinput', 'Failed to sanitize html because the input is unstable');
+	      }
+	      mXSSAttempts--;
+
+	      // strip custom-namespaced attributes on IE<=11
+	      if (window.document.documentMode) {
+	        stripCustomNsAttrs(inertBodyElement);
+	      }
+	      html = inertBodyElement.innerHTML; //trigger mXSS
+	      inertBodyElement.innerHTML = html;
+	    } while (html !== inertBodyElement.innerHTML);
+
+	    var node = inertBodyElement.firstChild;
+	    while (node) {
+	      switch (node.nodeType) {
+	        case 1: // ELEMENT_NODE
+	          handler.start(node.nodeName.toLowerCase(), attrToMap(node.attributes));
+	          break;
+	        case 3: // TEXT NODE
+	          handler.chars(node.textContent);
+	          break;
+	      }
+
+	      var nextNode;
+	      if (!(nextNode = node.firstChild)) {
+	        if (node.nodeType === 1) {
+	          handler.end(node.nodeName.toLowerCase());
+	        }
+	        nextNode = node.nextSibling;
+	        if (!nextNode) {
+	          while (nextNode == null) {
+	            node = node.parentNode;
+	            if (node === inertBodyElement) break;
+	            nextNode = node.nextSibling;
+	            if (node.nodeType === 1) {
+	              handler.end(node.nodeName.toLowerCase());
+	            }
+	          }
+	        }
+	      }
+	      node = nextNode;
+	    }
+
+	    while ((node = inertBodyElement.firstChild)) {
+	      inertBodyElement.removeChild(node);
+	    }
+	  }
+
+	  function attrToMap(attrs) {
+	    var map = {};
+	    for (var i = 0, ii = attrs.length; i < ii; i++) {
+	      var attr = attrs[i];
+	      map[attr.name] = attr.value;
+	    }
+	    return map;
+	  }
+
+
+	  /**
+	   * Escapes all potentially dangerous characters, so that the
+	   * resulting string can be safely inserted into attribute or
+	   * element text.
+	   * @param value
+	   * @returns {string} escaped text
+	   */
+	  function encodeEntities(value) {
+	    return value.
+	      replace(/&/g, '&amp;').
+	      replace(SURROGATE_PAIR_REGEXP, function(value) {
+	        var hi = value.charCodeAt(0);
+	        var low = value.charCodeAt(1);
+	        return '&#' + (((hi - 0xD800) * 0x400) + (low - 0xDC00) + 0x10000) + ';';
+	      }).
+	      replace(NON_ALPHANUMERIC_REGEXP, function(value) {
+	        return '&#' + value.charCodeAt(0) + ';';
+	      }).
+	      replace(/</g, '&lt;').
+	      replace(/>/g, '&gt;');
+	  }
+
+	  /**
+	   * create an HTML/XML writer which writes to buffer
+	   * @param {Array} buf use buf.join('') to get out sanitized html string
+	   * @returns {object} in the form of {
+	   *     start: function(tag, attrs) {},
+	   *     end: function(tag) {},
+	   *     chars: function(text) {},
+	   *     comment: function(text) {}
+	   * }
+	   */
+	  function htmlSanitizeWriterImpl(buf, uriValidator) {
+	    var ignoreCurrentElement = false;
+	    var out = bind(buf, buf.push);
+	    return {
+	      start: function(tag, attrs) {
+	        tag = lowercase(tag);
+	        if (!ignoreCurrentElement && blockedElements[tag]) {
+	          ignoreCurrentElement = tag;
+	        }
+	        if (!ignoreCurrentElement && validElements[tag] === true) {
+	          out('<');
+	          out(tag);
+	          forEach(attrs, function(value, key) {
+	            var lkey = lowercase(key);
+	            var isImage = (tag === 'img' && lkey === 'src') || (lkey === 'background');
+	            if (validAttrs[lkey] === true &&
+	              (uriAttrs[lkey] !== true || uriValidator(value, isImage))) {
+	              out(' ');
+	              out(key);
+	              out('="');
+	              out(encodeEntities(value));
+	              out('"');
+	            }
+	          });
+	          out('>');
+	        }
+	      },
+	      end: function(tag) {
+	        tag = lowercase(tag);
+	        if (!ignoreCurrentElement && validElements[tag] === true && voidElements[tag] !== true) {
+	          out('</');
+	          out(tag);
+	          out('>');
+	        }
+	        // eslint-disable-next-line eqeqeq
+	        if (tag == ignoreCurrentElement) {
+	          ignoreCurrentElement = false;
+	        }
+	      },
+	      chars: function(chars) {
+	        if (!ignoreCurrentElement) {
+	          out(encodeEntities(chars));
+	        }
+	      }
+	    };
+	  }
+
+
+	  /**
+	   * When IE9-11 comes across an unknown namespaced attribute e.g. 'xlink:foo' it adds 'xmlns:ns1' attribute to declare
+	   * ns1 namespace and prefixes the attribute with 'ns1' (e.g. 'ns1:xlink:foo'). This is undesirable since we don't want
+	   * to allow any of these custom attributes. This method strips them all.
+	   *
+	   * @param node Root element to process
+	   */
+	  function stripCustomNsAttrs(node) {
+	    while (node) {
+	      if (node.nodeType === window.Node.ELEMENT_NODE) {
+	        var attrs = node.attributes;
+	        for (var i = 0, l = attrs.length; i < l; i++) {
+	          var attrNode = attrs[i];
+	          var attrName = attrNode.name.toLowerCase();
+	          if (attrName === 'xmlns:ns1' || attrName.lastIndexOf('ns1:', 0) === 0) {
+	            node.removeAttributeNode(attrNode);
+	            i--;
+	            l--;
+	          }
+	        }
+	      }
+
+	      var nextNode = node.firstChild;
+	      if (nextNode) {
+	        stripCustomNsAttrs(nextNode);
+	      }
+
+	      node = node.nextSibling;
+	    }
+	  }
+	}
+
+	function sanitizeText(chars) {
+	  var buf = [];
+	  var writer = htmlSanitizeWriter(buf, noop);
+	  writer.chars(chars);
+	  return buf.join('');
+	}
+
+
+	// define ngSanitize module and register $sanitize service
+	angular.module('ngSanitize', []).provider('$sanitize', $SanitizeProvider);
+
+	/**
+	 * @ngdoc filter
+	 * @name linky
+	 * @kind function
+	 *
+	 * @description
+	 * Finds links in text input and turns them into html links. Supports `http/https/ftp/mailto` and
+	 * plain email address links.
+	 *
+	 * Requires the {@link ngSanitize `ngSanitize`} module to be installed.
+	 *
+	 * @param {string} text Input text.
+	 * @param {string} target Window (`_blank|_self|_parent|_top`) or named frame to open links in.
+	 * @param {object|function(url)} [attributes] Add custom attributes to the link element.
+	 *
+	 *    Can be one of:
+	 *
+	 *    - `object`: A map of attributes
+	 *    - `function`: Takes the url as a parameter and returns a map of attributes
+	 *
+	 *    If the map of attributes contains a value for `target`, it overrides the value of
+	 *    the target parameter.
+	 *
+	 *
+	 * @returns {string} Html-linkified and {@link $sanitize sanitized} text.
+	 *
+	 * @usage
+	   <span ng-bind-html="linky_expression | linky"></span>
+	 *
+	 * @example
+	   <example module="linkyExample" deps="angular-sanitize.js" name="linky-filter">
+	     <file name="index.html">
+	       <div ng-controller="ExampleController">
+	       Snippet: <textarea ng-model="snippet" cols="60" rows="3"></textarea>
+	       <table>
+	         <tr>
+	           <th>Filter</th>
+	           <th>Source</th>
+	           <th>Rendered</th>
+	         </tr>
+	         <tr id="linky-filter">
+	           <td>linky filter</td>
+	           <td>
+	             <pre>&lt;div ng-bind-html="snippet | linky"&gt;<br>&lt;/div&gt;</pre>
+	           </td>
+	           <td>
+	             <div ng-bind-html="snippet | linky"></div>
+	           </td>
+	         </tr>
+	         <tr id="linky-target">
+	          <td>linky target</td>
+	          <td>
+	            <pre>&lt;div ng-bind-html="snippetWithSingleURL | linky:'_blank'"&gt;<br>&lt;/div&gt;</pre>
+	          </td>
+	          <td>
+	            <div ng-bind-html="snippetWithSingleURL | linky:'_blank'"></div>
+	          </td>
+	         </tr>
+	         <tr id="linky-custom-attributes">
+	          <td>linky custom attributes</td>
+	          <td>
+	            <pre>&lt;div ng-bind-html="snippetWithSingleURL | linky:'_self':{rel: 'nofollow'}"&gt;<br>&lt;/div&gt;</pre>
+	          </td>
+	          <td>
+	            <div ng-bind-html="snippetWithSingleURL | linky:'_self':{rel: 'nofollow'}"></div>
+	          </td>
+	         </tr>
+	         <tr id="escaped-html">
+	           <td>no filter</td>
+	           <td><pre>&lt;div ng-bind="snippet"&gt;<br>&lt;/div&gt;</pre></td>
+	           <td><div ng-bind="snippet"></div></td>
+	         </tr>
+	       </table>
+	     </file>
+	     <file name="script.js">
+	       angular.module('linkyExample', ['ngSanitize'])
+	         .controller('ExampleController', ['$scope', function($scope) {
+	           $scope.snippet =
+	             'Pretty text with some links:\n' +
+	             'http://angularjs.org/,\n' +
+	             'mailto:us@somewhere.org,\n' +
+	             'another@somewhere.org,\n' +
+	             'and one more: ftp://127.0.0.1/.';
+	           $scope.snippetWithSingleURL = 'http://angularjs.org/';
+	         }]);
+	     </file>
+	     <file name="protractor.js" type="protractor">
+	       it('should linkify the snippet with urls', function() {
+	         expect(element(by.id('linky-filter')).element(by.binding('snippet | linky')).getText()).
+	             toBe('Pretty text with some links: http://angularjs.org/, us@somewhere.org, ' +
+	                  'another@somewhere.org, and one more: ftp://127.0.0.1/.');
+	         expect(element.all(by.css('#linky-filter a')).count()).toEqual(4);
+	       });
+
+	       it('should not linkify snippet without the linky filter', function() {
+	         expect(element(by.id('escaped-html')).element(by.binding('snippet')).getText()).
+	             toBe('Pretty text with some links: http://angularjs.org/, mailto:us@somewhere.org, ' +
+	                  'another@somewhere.org, and one more: ftp://127.0.0.1/.');
+	         expect(element.all(by.css('#escaped-html a')).count()).toEqual(0);
+	       });
+
+	       it('should update', function() {
+	         element(by.model('snippet')).clear();
+	         element(by.model('snippet')).sendKeys('new http://link.');
+	         expect(element(by.id('linky-filter')).element(by.binding('snippet | linky')).getText()).
+	             toBe('new http://link.');
+	         expect(element.all(by.css('#linky-filter a')).count()).toEqual(1);
+	         expect(element(by.id('escaped-html')).element(by.binding('snippet')).getText())
+	             .toBe('new http://link.');
+	       });
+
+	       it('should work with the target property', function() {
+	        expect(element(by.id('linky-target')).
+	            element(by.binding("snippetWithSingleURL | linky:'_blank'")).getText()).
+	            toBe('http://angularjs.org/');
+	        expect(element(by.css('#linky-target a')).getAttribute('target')).toEqual('_blank');
+	       });
+
+	       it('should optionally add custom attributes', function() {
+	        expect(element(by.id('linky-custom-attributes')).
+	            element(by.binding("snippetWithSingleURL | linky:'_self':{rel: 'nofollow'}")).getText()).
+	            toBe('http://angularjs.org/');
+	        expect(element(by.css('#linky-custom-attributes a')).getAttribute('rel')).toEqual('nofollow');
+	       });
+	     </file>
+	   </example>
+	 */
+	angular.module('ngSanitize').filter('linky', ['$sanitize', function($sanitize) {
+	  var LINKY_URL_REGEXP =
+	        /((ftp|https?):\/\/|(www\.)|(mailto:)?[A-Za-z0-9._%+-]+@)\S*[^\s.;,(){}<>"\u201d\u2019]/i,
+	      MAILTO_REGEXP = /^mailto:/i;
+
+	  var linkyMinErr = angular.$$minErr('linky');
+	  var isDefined = angular.isDefined;
+	  var isFunction = angular.isFunction;
+	  var isObject = angular.isObject;
+	  var isString = angular.isString;
+
+	  return function(text, target, attributes) {
+	    if (text == null || text === '') return text;
+	    if (!isString(text)) throw linkyMinErr('notstring', 'Expected string but received: {0}', text);
+
+	    var attributesFn =
+	      isFunction(attributes) ? attributes :
+	      isObject(attributes) ? function getAttributesObject() {return attributes;} :
+	      function getEmptyAttributesObject() {return {};};
+
+	    var match;
+	    var raw = text;
+	    var html = [];
+	    var url;
+	    var i;
+	    while ((match = raw.match(LINKY_URL_REGEXP))) {
+	      // We can not end in these as they are sometimes found at the end of the sentence
+	      url = match[0];
+	      // if we did not match ftp/http/www/mailto then assume mailto
+	      if (!match[2] && !match[4]) {
+	        url = (match[3] ? 'http://' : 'mailto:') + url;
+	      }
+	      i = match.index;
+	      addText(raw.substr(0, i));
+	      addLink(url, match[0].replace(MAILTO_REGEXP, ''));
+	      raw = raw.substring(i + match[0].length);
+	    }
+	    addText(raw);
+	    return $sanitize(html.join(''));
+
+	    function addText(text) {
+	      if (!text) {
+	        return;
+	      }
+	      html.push(sanitizeText(text));
+	    }
+
+	    function addLink(url, text) {
+	      var key, linkAttributes = attributesFn(url);
+	      html.push('<a ');
+
+	      for (key in linkAttributes) {
+	        html.push(key + '="' + linkAttributes[key] + '" ');
+	      }
+
+	      if (isDefined(target) && !('target' in linkAttributes)) {
+	        html.push('target="',
+	                  target,
+	                  '" ');
+	      }
+	      html.push('href="',
+	                url.replace(/"/g, '&quot;'),
+	                '">');
+	      addText(text);
+	      html.push('</a>');
+	    }
+	  };
+	}]);
+
+
+	})(window, window.angular);
+
+
+/***/ },
+/* 14 */
+/***/ function(module, exports, __webpack_require__) {
+
+	__webpack_require__(15);
+	module.exports = 'ngCookies';
+
+
+/***/ },
+/* 15 */
+/***/ function(module, exports) {
+
+	/**
+	 * @license AngularJS v1.6.1
+	 * (c) 2010-2016 Google, Inc. http://angularjs.org
+	 * License: MIT
+	 */
+	(function(window, angular) {'use strict';
+
+	/**
+	 * @ngdoc module
+	 * @name ngCookies
+	 * @description
+	 *
+	 * # ngCookies
+	 *
+	 * The `ngCookies` module provides a convenient wrapper for reading and writing browser cookies.
+	 *
+	 *
+	 * <div doc-module-components="ngCookies"></div>
+	 *
+	 * See {@link ngCookies.$cookies `$cookies`} for usage.
+	 */
+
+
+	angular.module('ngCookies', ['ng']).
+	  /**
+	   * @ngdoc provider
+	   * @name $cookiesProvider
+	   * @description
+	   * Use `$cookiesProvider` to change the default behavior of the {@link ngCookies.$cookies $cookies} service.
+	   * */
+	   provider('$cookies', [/** @this */function $CookiesProvider() {
+	    /**
+	     * @ngdoc property
+	     * @name $cookiesProvider#defaults
+	     * @description
+	     *
+	     * Object containing default options to pass when setting cookies.
+	     *
+	     * The object may have following properties:
+	     *
+	     * - **path** - `{string}` - The cookie will be available only for this path and its
+	     *   sub-paths. By default, this is the URL that appears in your `<base>` tag.
+	     * - **domain** - `{string}` - The cookie will be available only for this domain and
+	     *   its sub-domains. For security reasons the user agent will not accept the cookie
+	     *   if the current domain is not a sub-domain of this domain or equal to it.
+	     * - **expires** - `{string|Date}` - String of the form "Wdy, DD Mon YYYY HH:MM:SS GMT"
+	     *   or a Date object indicating the exact date/time this cookie will expire.
+	     * - **secure** - `{boolean}` - If `true`, then the cookie will only be available through a
+	     *   secured connection.
+	     *
+	     * Note: By default, the address that appears in your `<base>` tag will be used as the path.
+	     * This is important so that cookies will be visible for all routes when html5mode is enabled.
+	     *
+	     * @example
+	     *
+	     * ```js
+	     * angular.module('cookiesProviderExample', ['ngCookies'])
+	     *   .config(['$cookiesProvider', function($cookiesProvider) {
+	     *     // Setting default options
+	     *     $cookiesProvider.defaults.domain = 'foo.com';
+	     *     $cookiesProvider.defaults.secure = true;
+	     *   }]);
+	     * ```
+	     **/
+	    var defaults = this.defaults = {};
+
+	    function calcOptions(options) {
+	      return options ? angular.extend({}, defaults, options) : defaults;
+	    }
+
+	    /**
+	     * @ngdoc service
+	     * @name $cookies
+	     *
+	     * @description
+	     * Provides read/write access to browser's cookies.
+	     *
+	     * <div class="alert alert-info">
+	     * Up until Angular 1.3, `$cookies` exposed properties that represented the
+	     * current browser cookie values. In version 1.4, this behavior has changed, and
+	     * `$cookies` now provides a standard api of getters, setters etc.
+	     * </div>
+	     *
+	     * Requires the {@link ngCookies `ngCookies`} module to be installed.
+	     *
+	     * @example
+	     *
+	     * ```js
+	     * angular.module('cookiesExample', ['ngCookies'])
+	     *   .controller('ExampleController', ['$cookies', function($cookies) {
+	     *     // Retrieving a cookie
+	     *     var favoriteCookie = $cookies.get('myFavorite');
+	     *     // Setting a cookie
+	     *     $cookies.put('myFavorite', 'oatmeal');
+	     *   }]);
+	     * ```
+	     */
+	    this.$get = ['$$cookieReader', '$$cookieWriter', function($$cookieReader, $$cookieWriter) {
+	      return {
+	        /**
+	         * @ngdoc method
+	         * @name $cookies#get
+	         *
+	         * @description
+	         * Returns the value of given cookie key
+	         *
+	         * @param {string} key Id to use for lookup.
+	         * @returns {string} Raw cookie value.
+	         */
+	        get: function(key) {
+	          return $$cookieReader()[key];
+	        },
+
+	        /**
+	         * @ngdoc method
+	         * @name $cookies#getObject
+	         *
+	         * @description
+	         * Returns the deserialized value of given cookie key
+	         *
+	         * @param {string} key Id to use for lookup.
+	         * @returns {Object} Deserialized cookie value.
+	         */
+	        getObject: function(key) {
+	          var value = this.get(key);
+	          return value ? angular.fromJson(value) : value;
+	        },
+
+	        /**
+	         * @ngdoc method
+	         * @name $cookies#getAll
+	         *
+	         * @description
+	         * Returns a key value object with all the cookies
+	         *
+	         * @returns {Object} All cookies
+	         */
+	        getAll: function() {
+	          return $$cookieReader();
+	        },
+
+	        /**
+	         * @ngdoc method
+	         * @name $cookies#put
+	         *
+	         * @description
+	         * Sets a value for given cookie key
+	         *
+	         * @param {string} key Id for the `value`.
+	         * @param {string} value Raw value to be stored.
+	         * @param {Object=} options Options object.
+	         *    See {@link ngCookies.$cookiesProvider#defaults $cookiesProvider.defaults}
+	         */
+	        put: function(key, value, options) {
+	          $$cookieWriter(key, value, calcOptions(options));
+	        },
+
+	        /**
+	         * @ngdoc method
+	         * @name $cookies#putObject
+	         *
+	         * @description
+	         * Serializes and sets a value for given cookie key
+	         *
+	         * @param {string} key Id for the `value`.
+	         * @param {Object} value Value to be stored.
+	         * @param {Object=} options Options object.
+	         *    See {@link ngCookies.$cookiesProvider#defaults $cookiesProvider.defaults}
+	         */
+	        putObject: function(key, value, options) {
+	          this.put(key, angular.toJson(value), options);
+	        },
+
+	        /**
+	         * @ngdoc method
+	         * @name $cookies#remove
+	         *
+	         * @description
+	         * Remove given cookie
+	         *
+	         * @param {string} key Id of the key-value pair to delete.
+	         * @param {Object=} options Options object.
+	         *    See {@link ngCookies.$cookiesProvider#defaults $cookiesProvider.defaults}
+	         */
+	        remove: function(key, options) {
+	          $$cookieWriter(key, undefined, calcOptions(options));
+	        }
+	      };
+	    }];
+	  }]);
+
+	angular.module('ngCookies').
+	/**
+	 * @ngdoc service
+	 * @name $cookieStore
+	 * @deprecated
+	 * sinceVersion="v1.4.0"
+	 * Please use the {@link ngCookies.$cookies `$cookies`} service instead.
+	 *
+	 * @requires $cookies
+	 *
+	 * @description
+	 * Provides a key-value (string-object) storage, that is backed by session cookies.
+	 * Objects put or retrieved from this storage are automatically serialized or
+	 * deserialized by angular's toJson/fromJson.
+	 *
+	 * Requires the {@link ngCookies `ngCookies`} module to be installed.
+	 *
+	 * @example
+	 *
+	 * ```js
+	 * angular.module('cookieStoreExample', ['ngCookies'])
+	 *   .controller('ExampleController', ['$cookieStore', function($cookieStore) {
+	 *     // Put cookie
+	 *     $cookieStore.put('myFavorite','oatmeal');
+	 *     // Get cookie
+	 *     var favoriteCookie = $cookieStore.get('myFavorite');
+	 *     // Removing a cookie
+	 *     $cookieStore.remove('myFavorite');
+	 *   }]);
+	 * ```
+	 */
+	 factory('$cookieStore', ['$cookies', function($cookies) {
+
+	    return {
+	      /**
+	       * @ngdoc method
+	       * @name $cookieStore#get
+	       *
+	       * @description
+	       * Returns the value of given cookie key
+	       *
+	       * @param {string} key Id to use for lookup.
+	       * @returns {Object} Deserialized cookie value, undefined if the cookie does not exist.
+	       */
+	      get: function(key) {
+	        return $cookies.getObject(key);
+	      },
+
+	      /**
+	       * @ngdoc method
+	       * @name $cookieStore#put
+	       *
+	       * @description
+	       * Sets a value for given cookie key
+	       *
+	       * @param {string} key Id for the `value`.
+	       * @param {Object} value Value to be stored.
+	       */
+	      put: function(key, value) {
+	        $cookies.putObject(key, value);
+	      },
+
+	      /**
+	       * @ngdoc method
+	       * @name $cookieStore#remove
+	       *
+	       * @description
+	       * Remove given cookie
+	       *
+	       * @param {string} key Id of the key-value pair to delete.
+	       */
+	      remove: function(key) {
+	        $cookies.remove(key);
+	      }
+	    };
+
+	  }]);
+
+	/**
+	 * @name $$cookieWriter
+	 * @requires $document
+	 *
+	 * @description
+	 * This is a private service for writing cookies
+	 *
+	 * @param {string} name Cookie name
+	 * @param {string=} value Cookie value (if undefined, cookie will be deleted)
+	 * @param {Object=} options Object with options that need to be stored for the cookie.
+	 */
+	function $$CookieWriter($document, $log, $browser) {
+	  var cookiePath = $browser.baseHref();
+	  var rawDocument = $document[0];
+
+	  function buildCookieString(name, value, options) {
+	    var path, expires;
+	    options = options || {};
+	    expires = options.expires;
+	    path = angular.isDefined(options.path) ? options.path : cookiePath;
+	    if (angular.isUndefined(value)) {
+	      expires = 'Thu, 01 Jan 1970 00:00:00 GMT';
+	      value = '';
+	    }
+	    if (angular.isString(expires)) {
+	      expires = new Date(expires);
+	    }
+
+	    var str = encodeURIComponent(name) + '=' + encodeURIComponent(value);
+	    str += path ? ';path=' + path : '';
+	    str += options.domain ? ';domain=' + options.domain : '';
+	    str += expires ? ';expires=' + expires.toUTCString() : '';
+	    str += options.secure ? ';secure' : '';
+
+	    // per http://www.ietf.org/rfc/rfc2109.txt browser must allow at minimum:
+	    // - 300 cookies
+	    // - 20 cookies per unique domain
+	    // - 4096 bytes per cookie
+	    var cookieLength = str.length + 1;
+	    if (cookieLength > 4096) {
+	      $log.warn('Cookie \'' + name +
+	        '\' possibly not set or overflowed because it was too large (' +
+	        cookieLength + ' > 4096 bytes)!');
+	    }
+
+	    return str;
+	  }
+
+	  return function(name, value, options) {
+	    rawDocument.cookie = buildCookieString(name, value, options);
+	  };
+	}
+
+	$$CookieWriter.$inject = ['$document', '$log', '$browser'];
+
+	angular.module('ngCookies').provider('$$cookieWriter', /** @this */ function $$CookieWriterProvider() {
+	  this.$get = $$CookieWriter;
+	});
+
+
+	})(window, window.angular);
+
+
+/***/ },
+/* 16 */
+/***/ function(module, exports, __webpack_require__) {
+
+	var Todo = __webpack_require__(17);
 
 	Todo.config([
 	  'RestangularProvider',
@@ -55939,15 +57331,23 @@
 
 
 /***/ },
-/* 12 */
+/* 17 */
 /***/ function(module, exports) {
 
 	var Todo = angular.module('Todo', [
 	  'ui.router',
-	  'restangular'
+	  'restangular',
+	  'ngSanitize',
+	  'ngToast',
+	  'ngCookies'
 	]).run(
-	  function($rootScope) {
+	  function($rootScope, $cookies) {
+	    /**
+	    * Init values
+	    **/
 	    $rootScope._ = _;
+	    $rootScope.userSignedIn = !_.isUndefined($cookies.get('auth_token'));
+	    $rootScope.currentUser  = {};
 	  }
 	);
 
@@ -55955,10 +57355,10 @@
 
 
 /***/ },
-/* 13 */
+/* 18 */
 /***/ function(module, exports, __webpack_require__) {
 
-	var Todo = __webpack_require__(12);
+	var Todo = __webpack_require__(17);
 
 	Todo.config([
 	  '$stateProvider', '$urlRouterProvider', '$locationProvider', function($stateProvider, $urlRouterProvider, $locationProvider) {
@@ -55968,6 +57368,7 @@
 	    homeState = {
 	      name: 'home',
 	      url: '/',
+	      controller: 'AppController',
 	      templateUrl: 'views/homes/index.html'
 	    };
 	    todoState = {
@@ -55990,14 +57391,106 @@
 
 
 /***/ },
-/* 14 */
+/* 19 */
 /***/ function(module, exports, __webpack_require__) {
 
-	/* WEBPACK VAR INJECTION */(function($) {var Todo = __webpack_require__(12);
+	var Todo = __webpack_require__(17);
+
+	var AppController = Todo.controller('AppController', [
+	  '$rootScope',
+	  '$scope',
+	  'ngToast',
+	  '$cookies',
+	  'AuthService',
+	  '$state',
+	  'Restangular',
+	  function($rootScope, $scope, ngToast, $cookies, Auth, $state, Restangular) {
+	    /**
+	    * Local functions
+	    **/
+	    var signedInProcess = function(user) {
+	      setupSignedDefaultParams();
+	      $rootScope.userSignedIn = true;
+	      $cookies.put('auth_token', user.auth_token);
+	      $rootScope.currentUser = user;
+	      $state.go('todo');
+	    };
+	    var setupSignedDefaultParams = function () {
+	      return Restangular.setDefaultRequestParams(['get', 'remove', 'post', 'delete', 'put', 'patch'], { auth_token: $cookies.get('auth_token') })
+	    };
+	    var authenticateUser = function (event) {
+	      if(!$rootScope.userSignedIn) {
+	        event.preventDefault()
+	        $state.go('home');
+	      }
+	    }
+
+	    /**
+	    * First Init to Server
+	    **/
+	    if($rootScope.userSignedIn) {
+	      setupSignedDefaultParams();
+
+	      Auth.validate().then(
+	        function(response) {
+	          if(response.success) {
+	            signedInProcess(response.user);
+	          };
+	        }
+	      );
+	    }
+
+	    /**
+	    * $rootScope function libraries
+	    **/
+	    $rootScope.$on('$stateChangeStart', function(event, toState, toParams, fromState){
+	      if(toState.name !== 'home') {
+	        authenticateUser(event);
+	      }
+	    })
+
+	    /**
+	    * $scope function libraries
+	    **/
+	    $scope.login = function(user) {
+	      Auth.login(user).then(
+	        function(response) {
+	          if(response.success) {
+	            ngToast.success("Welcome Back");
+	            signedInProcess(response.user);
+	          } else {
+	            ngToast.danger(response.message);
+	          }
+	        }
+	      );
+	    };
+	    $scope.logout = function(user) {
+	      Auth.logout(user).then(
+	        function(response) {
+	          if(response.success) {
+	            $state.go('home');
+	            $rootScope.currentUser = {};
+	            $rootScope.userSignedIn = false;
+	            $cookies.remove('auth_token');
+	          }
+	        }
+	      );
+	    }
+
+	  }]
+	);
+
+	module.exports = AppController;
+
+
+/***/ },
+/* 20 */
+/***/ function(module, exports, __webpack_require__) {
+
+	/* WEBPACK VAR INJECTION */(function($) {var Todo = __webpack_require__(17);
 
 	var TodoController = Todo.controller('TodoController', [
-	  '$rootScope', '$scope', 'TaskService', function($rootScope, $scope, Task) {
-
+	  '$rootScope', '$scope', 'TaskService', '$cookies', function($rootScope, $scope, Task, $cookies) {
 	    /**
 	    * Init Value
 	    **/
@@ -56005,9 +57498,15 @@
 	    $scope.title = "Todo Application";
 	    $scope.hideDone = true;
 	    $scope.needEnter = false;
-	    Task.list().then(function(response) {
-	      $scope.tasks = response.tasks;
-	    });
+
+	    /**
+	    * Authentications Init
+	    **/
+	    if($rootScope.userSignedIn) {
+	      Task.list().then(function(response) {
+	        $scope.tasks = response.tasks;
+	      });
+	    }
 
 	    /**
 	    * $scope Function libraries
@@ -56066,19 +57565,19 @@
 
 	module.exports = TodoController;
 
-	/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(15)))
+	/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(21)))
 
 /***/ },
-/* 15 */
+/* 21 */
 /***/ function(module, exports) {
 
 	module.exports = jQuery;
 
 /***/ },
-/* 16 */
+/* 22 */
 /***/ function(module, exports, __webpack_require__) {
 
-	var Todo = __webpack_require__(12);
+	var Todo = __webpack_require__(17);
 
 	var TaskService = Todo.factory('TaskService', [
 	  'Restangular', function(Restangular) {
@@ -56099,6 +57598,33 @@
 	]);
 
 	module.exports = TaskService;
+
+
+/***/ },
+/* 23 */
+/***/ function(module, exports, __webpack_require__) {
+
+	var Todo = __webpack_require__(17);
+
+	var AuthService = Todo.factory('AuthService', [
+	  'Restangular', function(Restangular) {
+	    return {
+	      login: function(user) {
+	        if(_.isEmpty(user)){
+	          user = { email: '' }
+	        }
+
+	        return Restangular.one('sessions').post(undefined, { user: user });
+	      },
+	      validate: function() {
+	        return Restangular.one('sessions/validate').get(undefined);
+	      },
+	      logout: function(user) {
+	        return Restangular.one('sessions', user.id).remove(undefined);
+	      }
+	    }
+	  }
+	]);
 
 
 /***/ }

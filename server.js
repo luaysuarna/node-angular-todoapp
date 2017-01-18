@@ -19,6 +19,7 @@ app.use(function (req, res, next) {
   
   next();
 });
+app.use(express.static('node_modules'));
 app.use(express.static('bower_components'));
 app.use(express.static('app'));
 app.use(function(req, res) {

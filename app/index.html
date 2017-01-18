@@ -3,6 +3,8 @@
   <head>
     <title>Todoapp</title>
     <link  rel="stylesheet" href="/bootstrap/dist/css/bootstrap.min.css" type="text/css" media="screen">
+    <link  rel="stylesheet" href="/ng-toast/dist/ngToast.css" type="text/css" media="screen">
+    <link  rel="stylesheet" href="/ng-toast/dist/ngToast-animations.css" type="text/css" media="screen">
     <link  rel="stylesheet" href="/styles/style.css" type="text/css" media="screen">
 
     <!-- HTML5 shim and Respond.js for IE8 support of HTML5 elements and media queries -->
@@ -12,8 +14,8 @@
       <script src="https://oss.maxcdn.com/respond/1.4.2/respond.min.js"></script>
     <![endif]-->
   </head>
-  <body ng-controller="TodoController">
-    
+  <body ng-controller="AppController">
+    <toast></toast>    
     <!-- Navbar -->
     <nav class="navbar navbar-default navbar-fixed-top">
       <div class="container-fluid">
@@ -30,12 +32,13 @@
 
         <!-- Collect the nav links, forms, and other content for toggling -->
         <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
-          <ul class="nav navbar-nav navbar-right">
-            <li><a ui-sref="todo" ui-sref-active="active">Todo App</a></li>
+          <ul class="nav navbar-nav navbar-right signedWaiting {{ userSignedIn ? 'signedShow' : '' }}">
+            <li><a href='#' ng-click='logout(currentUser)'>Log out</a></li>
           </ul>
         </div><!-- /.navbar-collapse -->
       </div><!-- /.container-fluid -->
     </nav>
+
 
     <!-- End Navbar -->
     <div class="main-container container" ui-view></div>
