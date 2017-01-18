@@ -9,31 +9,44 @@ var AppController = Todo.controller('AppController', [
   '$state',
   'Restangular',
   function($rootScope, $scope, ngToast, $cookies, Auth, $state, Restangular) {
+
     /**
     * Local functions
     **/
     var signedInProcess = function(user) {
-      setupSignedDefaultParams();
-      $rootScope.userSignedIn = true;
+      $rootScope.setupSignedDefaultParams();
       $cookies.put('auth_token', user.auth_token);
       $rootScope.currentUser = user;
+      $rootScope.userSignedIn = true;
       $state.go('todo');
     };
-    var setupSignedDefaultParams = function () {
-      return Restangular.setDefaultRequestParams(['get', 'remove', 'post', 'delete', 'put', 'patch'], { auth_token: $cookies.get('auth_token') })
-    };
-    var authenticateUser = function (event) {
-      if(!$rootScope.userSignedIn) {
-        event.preventDefault()
+    var authenticateUser = function (event, toState) {
+      if(toState.data.$requireLogin && !$rootScope.userSignedIn) {
         $state.go('home');
       }
     }
+    var authenticateClear = function() {
+      $cookies.remove('auth_token');
+      $rootScope.currentUser = {};
+      $rootScope.userSignedIn = false;
+    }
+    window.authenticateClear = authenticateClear;
+
+    /**
+    * $rootScope function libraries
+    **/
+    $rootScope.setupSignedDefaultParams = function () {
+      return Restangular.setDefaultRequestParams(['get', 'remove', 'post', 'delete', 'put', 'patch'], { auth_token: $cookies.get('auth_token') })
+    };
+    $rootScope.$on('$stateChangeSuccess', function(event, toState, toParams, fromState){
+      authenticateUser(event, toState);
+    })
 
     /**
     * First Init to Server
     **/
     if($rootScope.userSignedIn) {
-      setupSignedDefaultParams();
+      $rootScope.setupSignedDefaultParams();
 
       Auth.validate().then(
         function(response) {
@@ -44,14 +57,6 @@ var AppController = Todo.controller('AppController', [
       );
     }
 
-    /**
-    * $rootScope function libraries
-    **/
-    $rootScope.$on('$stateChangeStart', function(event, toState, toParams, fromState){
-      if(toState.name !== 'home') {
-        authenticateUser(event);
-      }
-    })
 
     /**
     * $scope function libraries
@@ -80,8 +85,8 @@ var AppController = Todo.controller('AppController', [
         }
       );
     }
-
   }]
+
 );
 
 module.exports = AppController;

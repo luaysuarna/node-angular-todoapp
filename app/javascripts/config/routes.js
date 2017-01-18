@@ -9,13 +9,19 @@ Todo.config([
       name: 'home',
       url: '/',
       controller: 'AppController',
-      templateUrl: 'views/homes/index.html'
+      templateUrl: 'views/homes/index.html',
+      data: {
+        $requireLogin: false
+      }
     };
     todoState = {
       name: 'todo',
       url: '/todos',
       controller: 'TodoController',
-      templateUrl: 'views/todos/index.html'
+      templateUrl: 'views/todos/index.html',
+      data: {
+        $requireLogin: true
+      }
     };
 
     $stateProvider.state(homeState);

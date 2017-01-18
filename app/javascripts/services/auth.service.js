@@ -19,3 +19,5 @@ var AuthService = Todo.factory('AuthService', [
     }
   }
 ]);
+
+module.exports = AuthService;

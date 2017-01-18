@@ -14,6 +14,8 @@ var TodoController = Todo.controller('TodoController', [
     * Authentications Init
     **/
     if($rootScope.userSignedIn) {
+      $rootScope.setupSignedDefaultParams();
+      
       Task.list().then(function(response) {
         $scope.tasks = response.tasks;
       });

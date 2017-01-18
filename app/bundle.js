@@ -57369,13 +57369,19 @@
 	      name: 'home',
 	      url: '/',
 	      controller: 'AppController',
-	      templateUrl: 'views/homes/index.html'
+	      templateUrl: 'views/homes/index.html',
+	      data: {
+	        $requireLogin: false
+	      }
 	    };
 	    todoState = {
 	      name: 'todo',
 	      url: '/todos',
 	      controller: 'TodoController',
-	      templateUrl: 'views/todos/index.html'
+	      templateUrl: 'views/todos/index.html',
+	      data: {
+	        $requireLogin: true
+	      }
 	    };
 
 	    $stateProvider.state(homeState);
@@ -57405,31 +57411,44 @@
 	  '$state',
 	  'Restangular',
 	  function($rootScope, $scope, ngToast, $cookies, Auth, $state, Restangular) {
+
 	    /**
 	    * Local functions
 	    **/
 	    var signedInProcess = function(user) {
-	      setupSignedDefaultParams();
-	      $rootScope.userSignedIn = true;
+	      $rootScope.setupSignedDefaultParams();
 	      $cookies.put('auth_token', user.auth_token);
 	      $rootScope.currentUser = user;
+	      $rootScope.userSignedIn = true;
 	      $state.go('todo');
 	    };
-	    var setupSignedDefaultParams = function () {
-	      return Restangular.setDefaultRequestParams(['get', 'remove', 'post', 'delete', 'put', 'patch'], { auth_token: $cookies.get('auth_token') })
-	    };
-	    var authenticateUser = function (event) {
-	      if(!$rootScope.userSignedIn) {
-	        event.preventDefault()
+	    var authenticateUser = function (event, toState) {
+	      if(toState.data.$requireLogin && !$rootScope.userSignedIn) {
 	        $state.go('home');
 	      }
 	    }
+	    var authenticateClear = function() {
+	      $cookies.remove('auth_token');
+	      $rootScope.currentUser = {};
+	      $rootScope.userSignedIn = false;
+	    }
+	    window.authenticateClear = authenticateClear;
+
+	    /**
+	    * $rootScope function libraries
+	    **/
+	    $rootScope.setupSignedDefaultParams = function () {
+	      return Restangular.setDefaultRequestParams(['get', 'remove', 'post', 'delete', 'put', 'patch'], { auth_token: $cookies.get('auth_token') })
+	    };
+	    $rootScope.$on('$stateChangeSuccess', function(event, toState, toParams, fromState){
+	      authenticateUser(event, toState);
+	    })
 
 	    /**
 	    * First Init to Server
 	    **/
 	    if($rootScope.userSignedIn) {
-	      setupSignedDefaultParams();
+	      $rootScope.setupSignedDefaultParams();
 
 	      Auth.validate().then(
 	        function(response) {
@@ -57440,14 +57459,6 @@
 	      );
 	    }
 
-	    /**
-	    * $rootScope function libraries
-	    **/
-	    $rootScope.$on('$stateChangeStart', function(event, toState, toParams, fromState){
-	      if(toState.name !== 'home') {
-	        authenticateUser(event);
-	      }
-	    })
 
 	    /**
 	    * $scope function libraries
@@ -57476,8 +57487,8 @@
 	        }
 	      );
 	    }
-
 	  }]
+
 	);
 
 	module.exports = AppController;
@@ -57503,6 +57514,8 @@
 	    * Authentications Init
 	    **/
 	    if($rootScope.userSignedIn) {
+	      $rootScope.setupSignedDefaultParams();
+	      
 	      Task.list().then(function(response) {
 	        $scope.tasks = response.tasks;
 	      });
@@ -57625,6 +57638,8 @@
 	    }
 	  }
 	]);
+
+	module.exports = AuthService;
 
 
 /***/ }
