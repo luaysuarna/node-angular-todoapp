@@ -2,6 +2,15 @@ html {
   background-color: #fff;
 }
 
+.spinner-wrapper {
+  position: fixed;
+  height: 100%;
+  width: 100%;
+  z-index: 999999;
+  background: rgb(255, 255, 255);
+  margin-top: -19px;
+}
+
 .main-container {
   margin-top: 70px;
 }

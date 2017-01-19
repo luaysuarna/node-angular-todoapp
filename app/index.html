@@ -7,6 +7,7 @@
     <link rel="stylesheet" href="/selectize/dist/css/selectize.default.css">
     <link  rel="stylesheet" href="/ng-toast/dist/ngToast.css" type="text/css" media="screen">
     <link  rel="stylesheet" href="/ng-toast/dist/ngToast-animations.css" type="text/css" media="screen">
+    <link  rel="stylesheet" href="/styles/spinner.css" type="text/css" media="screen">
     <link  rel="stylesheet" href="/styles/style.css" type="text/css" media="screen">
 
     <!-- HTML5 shim and Respond.js for IE8 support of HTML5 elements and media queries -->
@@ -17,6 +18,9 @@
     <![endif]-->
   </head>
   <body ng-controller="AppController">
+    <div class="spinner-wrapper">
+      <div class="spinner"></div>
+    </div>
     <toast></toast>    
     <!-- Navbar -->
     <nav class="navbar navbar-default navbar-fixed-top">
@@ -44,7 +48,9 @@
 
     <!-- End Navbar -->
     <div class="main-container container" ui-view></div>
-
     <script type="text/javascript" src='bundle.js'></script>
+    <script>
+      $('.spinner-wrapper').fadeOut()
+    </script>
   </body>
 </html>
