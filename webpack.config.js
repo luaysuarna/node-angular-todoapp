@@ -4,6 +4,8 @@ var ExtractTextPlugin = require("extract-text-webpack-plugin");
 module.exports = {
   entry: [
     'script!jquery/dist/jquery.min.js',
+    'script!bower_components/bootstrap/dist/js/bootstrap.min.js',
+    'script!bower_components/selectize/dist/js/standalone/selectize.min.js',
     './app/app.js'
   ],
   externals: {
@@ -30,7 +32,9 @@ module.exports = {
       TodoConfig: 'app/javascripts/config/config.js',
       TodoConfigRoutes: 'app/javascripts/config/routes.js',
       TodoController: 'app/javascripts/controllers/todo.controller.js',
-      TaskService: 'app/javascripts/services/task.service.js'
+      TaskService: 'app/javascripts/services/task.service.js',
+
+      BoardService: 'app/javascripts/services/board.service.js'
     },
     extentions: ['', '.js']
   },

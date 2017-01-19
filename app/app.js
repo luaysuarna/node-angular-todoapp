@@ -2,6 +2,8 @@
 * Angular Plugins
 **/
 require('angular');
+require('angular-aria');
+require('angular-material');
 require('restangular');
 require('angular-ui-router');
 require('ng-toast');
@@ -32,3 +34,4 @@ require('TodoController');
 **/
 require('TaskService');
 require('AuthService');
+require('BoardService');

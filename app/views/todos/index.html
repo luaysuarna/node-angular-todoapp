@@ -9,6 +9,19 @@
         tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam</small>
       </li>
       <li class="list-group-item">
+        <form>
+          <md-autocomplete md-items="item in queryBoard(searchText)" md-selected-item="currentBoard" md-selected-item-change="selectedBoard(item)" md-item-text="item.name" md-min-length="4" placeholder="Choose your board?" md-search-text="searchText">
+            <md-item-template>
+              <span md-highlight-text="searchText" md-highlight-flags="^i">{{item.name}}</span>
+            </md-item-template>
+            <md-not-found>
+              "{{searchText}}" were found.
+              <a ng-click="newBoard(searchText)">Create a new one!</a>
+            </md-not-found>
+          </md-autocomplete>
+        </form>
+      </li>
+      <li class="list-group-item">
         <form ng-init='newTask' ng-submit='addTask(newTask)'>
           <div class="form-group {{ needEnter ? 'js-needEnter' : '' }}">
             <label class='control-label' for='name'>Add new task</label>

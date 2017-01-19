@@ -3,7 +3,10 @@ var Todo = angular.module('Todo', [
   'restangular',
   'ngSanitize',
   'ngToast',
-  'ngCookies'
+  'ngCookies',
+  'ngAria',
+  'ngAnimate',
+  'ngMaterial'
 ]).run(
   function($rootScope, $cookies) {
     /**

@@ -1,7 +1,13 @@
 var Todo = require('Todo');
 
 var TodoController = Todo.controller('TodoController', [
-  '$rootScope', '$scope', 'TaskService', '$cookies', function($rootScope, $scope, Task, $cookies) {
+  '$rootScope', 
+  '$scope', 
+  'TaskService', 
+  '$cookies', 
+  'BoardService',
+  'ngToast',
+  function($rootScope, $scope, Task, $cookies, Board, ngToast) {
     /**
     * Init Value
     **/
@@ -9,29 +15,45 @@ var TodoController = Todo.controller('TodoController', [
     $scope.title = "Todo Application";
     $scope.hideDone = true;
     $scope.needEnter = false;
-
-    /**
-    * Authentications Init
-    **/
-    if($rootScope.userSignedIn) {
-      $rootScope.setupSignedDefaultParams();
-      
-      Task.list().then(function(response) {
-        $scope.tasks = response.tasks;
-      });
-    }
+    $scope.searchText = null;
 
     /**
     * $scope Function libraries
     **/
-    $scope.addTask = function(task) {
-      Task.create(task).then(function(response) {
-        if (response.success) {
-          return $scope.tasks.push(response.task);
+    $scope.selectedBoard = function(board) {
+      getTasks(board);
+    }
+    $scope.queryBoard = function(query) {
+      return Board.search(query).then(
+        function(response){
+          return response.boards;
         }
-      });
-      $scope.newTask = {};
-      return $scope.needEnter = false;
+      );
+    };
+    $scope.newBoard = function(name) {
+      Board.create(name).then(
+        function(response){
+          if(response.success){
+            $scope.currentBoard = response.board;
+            ngToast.success(response.message);
+          } else {
+            ngToast.danger(response.message);
+          }
+        }
+      );
+    };
+    $scope.addTask = function(task) {
+      if(_.isObject($scope.currentBoard)){
+        Task.create(task, $scope.currentBoard.id).then(function(response) {
+          if (response.success) {
+            return $scope.tasks.push(response.task);
+          }
+        });
+        $scope.newTask = {};
+        return $scope.needEnter = false;
+      } else {
+        ngToast.danger('Please choose your card first!');
+      }
     };
     $scope.switchDone = function(index, e) {
       var $el, $wrapper;
@@ -57,6 +79,16 @@ var TodoController = Todo.controller('TodoController', [
     $scope.$watch('newTask.name', function(value) {
       return checkNewTask(value);
     });
+    $scope.$watch('searchText', function(value) {
+      $scope.tasks = [];
+    });
+    $scope.$watch('currentBoard', function(value) {
+      if(_.isObject(value)){
+        Task.list(value).then(function(response) {
+          $scope.tasks = response.tasks;
+        });
+      }
+    });
 
     /**
     * Local Function
@@ -73,6 +105,19 @@ var TodoController = Todo.controller('TodoController', [
     toggleStatusTask = function(task) {
       return Task.switchActive(task);
     };
+    createFilterFor = function (query) {
+      var lowercaseQuery = angular.lowercase(query);
+
+      return function filterFn(state) {
+        return _.includes(state.name.toLowerCase(), lowercaseQuery);
+      };
+    };
+    getTasks = function(board)  {
+      if(_.isObject(board)) {
+        $scope.currentBoard = board;
+      }
+    };
+
   }
 ]);
 
