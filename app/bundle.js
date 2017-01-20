@@ -94926,7 +94926,8 @@
 	  'ngCookies',
 	  'ngAria',
 	  'ngAnimate',
-	  'ngMaterial'
+	  'ngMaterial',
+	  'ngActionCable'
 	]).run(
 	  function($rootScope, $cookies) {
 	    /**
@@ -95094,7 +95095,8 @@
 	  '$cookies', 
 	  'BoardService',
 	  'ngToast',
-	  function($rootScope, $scope, Task, $cookies, Board, ngToast) {
+	  'ActionCableChannel',
+	  function($rootScope, $scope, Task, $cookies, Board, ngToast, ActionCableChannel) {
 	    /**
 	    * Init Value
 	    **/
@@ -95176,6 +95178,30 @@
 	        });
 	      }
 	    });
+
+	    /**
+	    * Setup Action Cable
+	    **/
+	    var consumer = new ActionCableChannel('NotificationChannel');
+	    var callback = function(response) {
+	      ngToast.success(response.message);
+
+	      if(_.isObject(response.task)){
+	        var task = response.task;
+	        if(task.board_id === $scope.currentBoard.id) {
+	          $scope.tasks.push(task);
+	        }
+	      }
+	    };
+	    consumer.subscribe(callback).then(
+	      function() {
+	        $rootScope.$watch('userSignedIn', function(value){
+	          if(!value){
+	            consumer.unsubscribe()
+	          }
+	        });
+	      }
+	    );;
 
 	    /**
 	    * Local Function

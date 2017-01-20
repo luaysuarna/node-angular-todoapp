@@ -6,7 +6,8 @@ var Todo = angular.module('Todo', [
   'ngCookies',
   'ngAria',
   'ngAnimate',
-  'ngMaterial'
+  'ngMaterial',
+  'ngActionCable'
 ]).run(
   function($rootScope, $cookies) {
     /**

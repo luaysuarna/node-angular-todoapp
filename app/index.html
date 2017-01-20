@@ -1,12 +1,14 @@
 <!DOCTYPE html>
 <html ng-app='Todo'>
   <head>
+    <meta name="action-cable-url" content="ws://localhost:3000/cable"/>
     <title>Todoapp</title>
     <link  rel="stylesheet" href="/bootstrap/dist/css/bootstrap.min.css" type="text/css" media="screen">
     <link  rel="stylesheet" href="/angular-material/angular-material.min.css" type="text/css" media="screen">
     <link rel="stylesheet" href="/selectize/dist/css/selectize.default.css">
     <link  rel="stylesheet" href="/ng-toast/dist/ngToast.css" type="text/css" media="screen">
     <link  rel="stylesheet" href="/ng-toast/dist/ngToast-animations.css" type="text/css" media="screen">
+    <link  rel="stylesheet" href="/nprogress/nprogress.css" type="text/css" media="screen">
     <link  rel="stylesheet" href="/styles/spinner.css" type="text/css" media="screen">
     <link  rel="stylesheet" href="/styles/style.css" type="text/css" media="screen">
 
@@ -49,6 +51,8 @@
     <!-- End Navbar -->
     <div class="main-container container" ui-view></div>
     <script type="text/javascript" src='bundle.js'></script>
+    <script src="angular-websocket/dist/angular-websocket.min.js"></script> 
+    <script src="angular-actioncable/dist/angular-actioncable.js"></script> 
     <script>
       $('.spinner-wrapper').fadeOut()
     </script>
