@@ -143,6 +143,11 @@
 	__webpack_require__(33);
 	__webpack_require__(34);
 
+	/**
+	* Angular Services
+	**/
+	__webpack_require__(35);
+
 
 /***/ },
 /* 9 */
@@ -95096,7 +95101,8 @@
 	  'BoardService',
 	  'ngToast',
 	  'ActionCableChannel',
-	  function($rootScope, $scope, Task, $cookies, Board, ngToast, ActionCableChannel) {
+	  'TodoModel',
+	  function($rootScope, $scope, Task, $cookies, Board, ngToast, ActionCableChannel, TodoModel) {
 	    /**
 	    * Init Value
 	    **/
@@ -95105,6 +95111,15 @@
 	    $scope.hideDone = true;
 	    $scope.needEnter = false;
 	    $scope.searchText = null;
+
+	    $scope.tasks = TodoModel.getList().then(
+	      function(result) {
+	        $scope.tasks = TodoModel.list;
+	        console.log(result);
+	      }
+	    );
+	    // setTimeout(function(){
+	    // }, 10)
 
 	    /**
 	    * $scope Function libraries
@@ -95323,6 +95338,30 @@
 	]);
 
 	module.exports = BoardService;
+
+
+/***/ },
+/* 35 */
+/***/ function(module, exports, __webpack_require__) {
+
+	var Todo = __webpack_require__(27);
+
+	var TodoModel = Todo.service('TodoModel', [
+	  'TaskService', function(TaskService) {
+	    
+	    const self = this;
+
+	    this.list = {}
+	    this.getList = function() {
+	      return TaskService.list(1).then(function(response) {
+	        self.list = response.tasks;
+	        return response;
+	      });
+	    }
+	  }
+	]);
+
+	module.exports = TodoModel;
 
 
 /***/ }

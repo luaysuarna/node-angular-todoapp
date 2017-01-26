@@ -35,3 +35,8 @@ require('TodoController');
 require('TaskService');
 require('AuthService');
 require('BoardService');
+
+/**
+* Angular Services
+**/
+require('TodoModel');

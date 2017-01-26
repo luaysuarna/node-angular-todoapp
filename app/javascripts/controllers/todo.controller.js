@@ -8,7 +8,8 @@ var TodoController = Todo.controller('TodoController', [
   'BoardService',
   'ngToast',
   'ActionCableChannel',
-  function($rootScope, $scope, Task, $cookies, Board, ngToast, ActionCableChannel) {
+  'TodoModel',
+  function($rootScope, $scope, Task, $cookies, Board, ngToast, ActionCableChannel, TodoModel) {
     /**
     * Init Value
     **/
@@ -17,6 +18,15 @@ var TodoController = Todo.controller('TodoController', [
     $scope.hideDone = true;
     $scope.needEnter = false;
     $scope.searchText = null;
+
+    $scope.tasks = TodoModel.getList().then(
+      function(result) {
+        $scope.tasks = TodoModel.list;
+        console.log(result);
+      }
+    );
+    // setTimeout(function(){
+    // }, 10)
 
     /**
     * $scope Function libraries

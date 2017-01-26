@@ -34,7 +34,9 @@ module.exports = {
       TodoController: 'app/javascripts/controllers/todo.controller.js',
       TaskService: 'app/javascripts/services/task.service.js',
 
-      BoardService: 'app/javascripts/services/board.service.js'
+      BoardService: 'app/javascripts/services/board.service.js',
+
+      TodoModel: 'app/javascripts/models/todo.model.js'
     },
     extentions: ['', '.js']
   },
